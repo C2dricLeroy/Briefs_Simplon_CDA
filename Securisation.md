@@ -11,8 +11,8 @@ Table des matières :
   - [La sanitisation :](#la-sanitisation-)
   - [L'accès aux données :](#laccès-aux-données-)
   - [L'authentification :](#lauthentification-)
-  - [Session, token et cookies :](#session-token-et-cookies-)
-  - [La sécurisation technique : API, Javascript, ...](#la-sécurisation-technique--api-javascript-)
+  - [Session et token :](#session-et-token-)
+  - [La sécurisation des API](#la-sécurisation-des-api)
   - [La journalisation :](#la-journalisation-)
   - [Sécurisation en phase finale et en maintenance.](#sécurisation-en-phase-finale-et-en-maintenance)
 - [Conclusion :](#conclusion-)
@@ -88,11 +88,18 @@ Il est à retenir que ces défenses sont nécessaires à la sécurisation d'une 
 Lorsque l'on parle de sécurisation des donnée, nous souhaitons rendre illisible l'information à tout potentiel attaquant. Pour cela, un message en clair est chiffré à l'aide de ce que l'on appelle une fonction de hachage. 
 Cette **fonction de hachage** est une fonction mathématique qui fragmente et modifie un message de façon à ce que le résultat obtenu ne permette pas le retour au message originel. 
 
+Concernant l'algorithme utilisé pour le hachage, nous faisons le choix d'utiliser le **SHA 256**, algorithme développé par la NSA. Il est une version réputée pour sa fiabilité, sa précision et sa difficulté de déchiffrement. 
+
 Néanmoins, la fonction de hachage comporte une faille: lorsque l'algorithme clé est trouvé, tout _input_ est facilement déchiffrable par l'attaquant. C'est pour cette raison qu'il est indispensable d'y adjoindre un salage. 
 Le salage est une opération qui consiste à ajouter des mots ou des caractères aléatoires à l'empreinte obtenue par le hachage. Le tout est haché une nouvelle fois de façon à ce que l'on ne puisse plus trouver le messsage original, sauf si l'on connait le sel utilisé. 
 
 Afin d'effectuer un salage efficace, nous ne connaitrons pas le processus de salage utilisé, seul le logiciel **BCrypt** qui sera utilisé connaîtra le salage utilisé. 
 
+Notre politique concernant la création, le stockage et la gestion des mots de passe peut se résumer ainsi : 
+- Pas de mots de passes stockés en clair
+- Compte strictement nominatif par utilisateur
+- Pas de délai d'expiration des mots de passe côté utilisateur et rédacteur, mais définition d'une durée de validité de 3 mois pour les employés (modérateurs et administrateurs)
+- Mise en plce d'une demande de Mot de Passe avant chaque opération sensible. 
 
 ## La sanitisation : 
 
@@ -115,35 +122,66 @@ Pour notre stratégie de sécurisation, la sanitisation se doit d'intervenir cô
 Dans le but de répondre au cahier des charge donné, mais également dans le but d'appliquer le principe de moindre privilège, une stratégie **RBAC** est à développer. 
 RBAC veut dire _Role Based Access Control_, ce qui veut dire que les droits d'accès ne sont pas les mêmes selon le rôle qu'occupe l'utilisateur. 
 
-Différents niveaux d'accès sont demandés dans le cahier des charges, en accord avec celkui-ci nous proposons la hiérarchie suivante : 
+Différents niveaux d'accès sont demandés dans le cahier des charges, en accord avec celui-ci nous proposons la hiérarchie suivante : 
 - _Root_ : Correspond à un accès total à l'application, du code source aux bases de données. Nous proposons de limiter à un seul le profil Root.
 - _Administrateur_ : Accès complet aux données hors code source et configurations techniques. Accès global au site depuis une interface administrateur. Possibilité d'ajout, modification ou suppression des informations concernant les modérateurs, rédacteurs et utilisateurs 
 - _Modérateur_ : Réservé aux employés : Droit rédactionnel : Validation , ajout et modification des contenus rédactionnels présents sur le site. 
 - _Rédacteur_ : Proposition de contenu rédactionnel, nous proposons de réserver ce rôle aux entreprises partenaires. Les propositions sont soumises aux modérateurs avant publication. 
-- _Utilisateur_ : Public cible de l'application, les utilisateurs
+- _Utilisateur_ : Public cible de l'application, les utilisateurs profitent des fonctionnalités de l'application avec peu de droits sur la modification des données. 
+
+De façon générale, les données seront stockées selon une politique de sauvegarde stricte. 
+De plus, les recommandations liées au _Règlement général sur la protection des données_ sera suivi.
+
 
 ## L'authentification : 
 
-L'authentification permet de vérifgier qu'une poersonne est bien celle qu'elle prétend être. 
+L'authentification permet de vérifier qu'une personne est bien celle qu'elle prétend être. 
 Différentes stratégies d'authentification sont possibles. 
-
+C'est une étape nécessaire dans la mise en plce du _RBAC_ et des _sessions_. 
 Les sensibilités des données en jeu étant différentes en fonction des rôles utilisateur, différents niveaux d'authentification sont nécessaires. 
 
-Pour les utilisateurs 
-  
-## Session, token et cookies : 
+L'authentification se déroule en trois phases : 
+- Enregistrement
+- Identification
+- Authentification
+Avant autorisation de l'accès. 
 
-Lorsque l'authentification est réussie et dans la continuité du RBAC proposé, l'utilisateur est conduit sur une certaine session. La session est un lieu dans l'application dans lequel l'utilisateur est limité en action et interaction avec l'application. 
-Il est également possible de définir un temps de session à l'issue duquel l'utilisateur devra de nouveau s'authentifier. 
+L'authentification est une zone sensible de l'applciation car elle est vulnérable aux attaques (Force brute, MITM; vol des moyens d'authentifications, ...)
+
+Pour les profils _administrateurs_ et _modérateurs_, il est préférable d'opter pour une authentification forte. Le choix d'une double authentification est discutable car en pratique, le collaborateur doit disposer des deux moyens d'authentification à chaque connexion. Un PIN individuel ou MdP supplémentaire au couple Identifiant/MdP peut être intéressant. Celui-ci peut être basé sur un facteur de connaisance du collaborateur et défini par celui-ci lors de l'ouverture du compte par l'admin. 
+
+Pour les profils _utilisateurs_ , nous mettons en place un couple motd de passe/identifiant. Le choix d'un mot de passe robuste (min 12 caractères, avec caractères spéciaux) sans délai d'expiration nous apparaît un meilleur choix au regard de la fluidité de l'expérience utilisateur. 
+
+
+## Session et token : 
+
+Lorsque l'authentification est réussie et dans la continuité du RBAC proposé, l'utilisateur est conduit sur une certaine session. La session peut être représenté comme un lieu dans l'application dans lequel l'utilisateur est limité en actions et interactions avec l'application. Il est important de comprendre qu'il ne s'agit ni d'un lieu virtuel ni d'un lieu réel, mais d'un espace défini dans le temps, dont les limites sont posées par les autorisations s'appliquant au profil. 
+Il est dans ce contexte important de définir un temps de session à l'issue duquel l'utilisateur devra de nouveau s'authentifier. 
 
 Dans le cas de notre application et afin de conserver une expérience utilisateur fluide, nous décidons de définir un temps de session long d'une journée. Ce choix arbitraire semble un compromis entre une expérience utilisateur fluide en laissant le temps de procéder aux démarches en jeu, tout en garantissant une certaine sécurité. De plus, notre application ne met pas en jeu de données sensibles concernant les utilisateurs, permettant ainsi un temps de session plus long. 
 
-## La sécurisation technique : API, Javascript, ... 
+La session est mise en place par l'envoie en mémoire du navigateur côté client d'un cookie de session. 
+Le **cookie** un fichier déposé en mémoire du navigateur. Il n'est en principe utilisable que par le site l'ayant déposé. Les cookies sont définis par le protocole HTTP et permettent de stocker des informations concernant le site en mémoire du navigzateur afin d'améliorer la navigation sur celui-ci (préférences, ...). L'information contenue dans le cookie est 
 
+Dans notre cas, afin de faciliter l'expérience utilisateur en maintenant des sessions ouvertes, nous pouvons utiliser les cookies afin de contenir un identifiant de session unique. Lors des navigations futures, le navigateur enverra l'information dans ce cookie lors de la requête. Le serveur reconnaît l'authentification et permet l'accès au service. 
+
+Attention, l'utilisation de cookies nécessite une bonne sécurisation globale de l'application. 
+
+
+## La sécurisation des API
+
+L'**API** pour _Application programming Interface_ est une application dans notre application. C'est une partie de notre application (un microservice) qui permet l'accès à la base de donnée. Celle-ci peut constituer une porte d'entrée vers nos informations potentiellement sensibles en augmentant la surface d'attaque de notre application, celles-ci doivent donc être sécurisées. 
+Elles sont elles-mêmes sensibles aux attaques courantes WSS, SQLI, MITM. 
+
+L'application de la plupart des protocoles précédemment évoqué, comme l'utilisation d'un protocole HTTPS la définition des profils autorisatisés et l'utilisation de jetons d'identification permettent de sécuriser notre API. 
+
+Ajoutons tout de même à ces protocoles deux recommandations : 
+- La définition de quotas de limitation de requête. Sans impacter l'expérience utilisateur (ou admin ou modérateur), cette mesure permet de prévenir la multiplication de requêtes lors d'une attaque. Cette mesure permet également de mettre en place un historique de l'utilisation de l'API. 
+- Utilisation d'une API stateless
 
 ## La journalisation : 
 
-Une autre protection concevable est la journalisation. Celle-ci consiste à tenir un journal horodaté de toutes les actions se déroulant sur notre serveur. 
+Une autre protection concevable est la **journalisation**. Celle-ci consiste à tenir un journal horodaté de toutes les actions se déroulant sur notre serveur. 
 Il est en particulier utile dans le cadre de notre stratégie de sécurisation d'enregister les événements liés aux facteurs d'authentification afin de détecter les tentatives d'authentification frauduleuses (répétion de l'entrée dans le cadre d'une attaque par force brute). 
 
 ## Sécurisation en phase finale et en maintenance. 
