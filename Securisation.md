@@ -16,6 +16,7 @@ Table des matières :
   - [L'authentification :](#lauthentification-)
   - [Session et token :](#session-et-token-)
   - [La sécurisation des API](#la-sécurisation-des-api)
+  - [Politique de sauvegarde des serveurs :](#politique-de-sauvegarde-des-serveurs-)
   - [La journalisation :](#la-journalisation-)
   - [Sécurisation en phase finale et en maintenance.](#sécurisation-en-phase-finale-et-en-maintenance)
 - [Conclusion :](#conclusion-)
@@ -43,7 +44,7 @@ First of all, let's take a look at the different must commons types of menace we
 From theses menace families, it exists lots of attacks, here are some: 
 - **Cross-Site-Scripting**: The **XSS** attack is an attack where the attacker is trying to inject some malicious code in our application. 
 - **SQLi**: 
-- **CSRF**
+- **CSRF**:
 
 # Introduction
 ## Que veut dire sécuriser un système ? 
@@ -56,7 +57,8 @@ Il est bien connu qu'Internet est un  système permettant la communication de pl
 - **Intégrité**: Le message envoyé doit être conservé dans sa totalité et ne pas être modifié en chemin par un attaquant.  
 Nous verrons que ces trois points constituent les pilliers de toute stratégie de sécurisation.
 
-L'entièreté de notre proposition de stratégie de sécurisation aura pour but de faire respecter ces trois pilliers de l'échange d'information. 
+L'entièreté de notre proposition de stratégie de sécurisation aura pour but de faire respecter ces trois pilliers de l'échange d'information.   
+
 
 ## Se prémunir, mais contre quelles attaques ? 
 
@@ -70,7 +72,8 @@ Ces familles de menaces donnent lieu à ces attaques les plus courantes :
 - **Injection attacks (SQLI)**: Injection de commandes SQL afin de tester l'accès aux données.
 - **CSRF** : C'est un type d'attaque par l'intermédiaire de l'utilisateur. La cible de l'attaque est l'application. Il est hautement conseillé pour un site officiel et institutionnel de se prévenir de ce type d'attaques. 
 
-Le passage en revue de ces grandes familles d'attaques nous paraît un point nécessaire afin d'introduire ces termes qui seront utilisés tout au long de ce guide.
+Le passage en revue de ces grandes familles d'attaques nous paraît un point nécessaire afin d'introduire ces termes qui seront utilisés tout au long de ce guide.   
+
 
 ## Comment sécuriser une application ? 
 
@@ -80,7 +83,8 @@ vant la présentation de notre stratégie de sécurisation spécifique, arrêton
 2) **Le moindre privilège**: Le moindre privilège permet de filtrer qui parmi les utilisateurs aura accès à certaines données. Plusieurs niveaux d'accès peuvent être définis parmi plusieurs sous-systèmes. 
 3) **La réduction de la surface d'attaque**: La réduction de la surface d'attaque passe par la minimisation des données exposées, mais également par les bonnes pratiques de sauvegarde des données sensibles. Cette approche est complémentaire du moindre privilège. 
 
-All of the present document is based to follow a maximum of the official ANSSI's recommendations. 
+All of the present document is based to follow a maximum of the official ANSSI's recommendations and, moreover in accordance with the RGPD's policy.  
+
 
 # Stratégie de sécurisation : 
 
@@ -94,7 +98,8 @@ Pour notre application, il peut être intéressant de contourner cette directive
 
 Enfin, afin de s'assurer le respect du principe de réduction de la surface d'attaque, notre application devra restreindre les données accessibles aux autres pages à l'aide des **CSP** _Constent Secure Policy_. 
 
-Pour finir, la mise en place de **SRI** pour _Subressource integrity_ est également fortement conseillée afin de vérifier l'authenticité des ressources aux sources externes. Pour simplifier, lorsqu'une ressource extérieure est terminée, celle-ci est passée dans une fonction dite de hashage qui produit une certaine empreinte. Cette empreinte est mise à disposition afin que le navigateur compare l'exactitude de celle-ci avec la ressource reçue. Si l'empreinte n'a pas changé, les éléments du fichier n'ont pas été modifiés par un attaquant malveillant. 
+Pour finir, la mise en place de **SRI** pour _Subressource integrity_ est également fortement conseillée afin de vérifier l'authenticité des ressources aux sources externes. Pour simplifier, lorsqu'une ressource extérieure est terminée, celle-ci est passée dans une fonction dite de hashage qui produit une certaine empreinte. Cette empreinte est mise à disposition afin que le navigateur compare l'exactitude de celle-ci avec la ressource reçue. Si l'empreinte n'a pas changé, les éléments du fichier n'ont pas été modifiés par un attaquant malveillant.   
+
 
 ## Les protocoles de protection de l'échange de donnée : 
 
@@ -108,7 +113,7 @@ En parrallèle, le **HSTS** pour _HTTP Strict Transport Security_ doit être mis
 
 Ces protocoles de sécurité sont indispensable à toute navigation Internet, elles sont de plus une clé pour le référencement sur les moteurs de recherche. 
 
-Il est à retenir que ces défenses sont nécessaires à la sécurisation d'une application mais non suffisantes. C'est pourquoi d'autres vulnérabilités sont à prendre en compte. Dans ce contexte, notre sécurisation d'application s'appuiera forcément sur le procole HTTPS mais ne peut se suffir de celui-ci. 
+Il est à retenir que ces défenses sont nécessaires à la sécurisation d'une application mais non suffisantes. C'est pourquoi d'autres vulnérabilités sont à prendre en compte. Dans ce contexte, notre sécurisation d'application s'appuiera forcément sur le procole HTTPS mais ne peut se suffir de celui-ci.   
 
 
 ## Hachage, salage et Mots de passe : 
@@ -134,7 +139,9 @@ Notre politique concernant la création, le stockage et la gestion des mots de p
 - Ne pas afficher d'informations sur les raisons de l'échec d'une authentification. 
 
 L'ensemble des propositions de ce guide (canal sécurisé TLS, authentification, ...) concernent également cette politique de gestion des mots de passe. 
-  
+
+Toute donnée sensible sera chiffrée suivant le même processus. De même, pour limiter les risques en réduisant la surface d'attaque et en accord avec la législation RGPD (Règlement Général sur la Protection des Données), chaque donnée sensible devra être récolté pour un but précis et pré-assigné.   
+
 
 ## La sanitisation : 
 
@@ -149,7 +156,7 @@ Plusieurs niveau de traitement des données sont disonibles :
 - Contrôle JS côté client: Reg-Exp, strict-mode, ... 
 - Traitement de la donnée en arrière-plan : Désactivation et assainissement des potentielles injections SQL et Javascript.
   
-Pour notre stratégie de sécurisation, la sanitisation se doit d'intervenir côté client et côté serveur, d'une part afin de fluidifier l'expérience utilisateur d'un utilisateur maladroit ne respectant pas les conditions, d'autre part pour empêcher en profondeur (avec un traitement plus lourd et donc plus long), un attaquant d'injecter de mauvaises commandes. Cette défense est particulièrement utile envers l'injection SQL et la XSS. 
+Pour notre stratégie de sécurisation, la sanitisation se doit d'intervenir côté client et côté serveur, d'une part afin de fluidifier l'expérience utilisateur d'un utilisateur maladroit ne respectant pas les conditions, d'autre part pour empêcher en profondeur (avec un traitement plus lourd et donc plus long), un attaquant d'injecter de mauvaises commandes. Cette défense est particulièrement utile envers l'injection SQL et la XSS.   
 
 
 ## L'accès aux données : 
@@ -165,7 +172,7 @@ Différents niveaux d'accès sont demandés dans le Product Backlog, en accord a
 - _Utilisateur_ : Public cible de l'application, les utilisateurs profitent des fonctionnalités de l'application avec peu de droits sur la modification des données. 
 
 De façon générale, les données seront stockées selon une politique de sauvegarde stricte. 
-De plus, les recommandations liées au _Règlement général sur la protection des données_ sera suivi.
+De plus, les recommandations liées au _Règlement général sur la protection des données_ sera suivi.  
 
 
 ## L'authentification : 
@@ -185,7 +192,7 @@ L'authentification est une zone sensible de l'application car elle est vulnérab
 
 Pour les profils _administrateurs_ et _modérateurs_, il est préférable d'opter pour une authentification forte. Le choix d'une double authentification est discutable car en pratique, le collaborateur doit disposer des deux moyens d'authentification à chaque connexion. Un PIN individuel ou MdP supplémentaire au couple Identifiant/MdP peut être intéressant. Celui-ci peut être basé sur un facteur de connaisance du collaborateur et défini par celui-ci lors de l'ouverture du compte par l'admin. 
 
-Pour les profils _utilisateurs_ , nous mettons en place un couple motd de passe/identifiant. Le choix d'un mot de passe robuste (min 12 caractères, avec caractères spéciaux) sans délai d'expiration nous apparaît un meilleur choix au regard de la fluidité de l'expérience utilisateur. 
+Pour les profils _utilisateurs_ , nous mettons en place un couple motd de passe/identifiant. Le choix d'un mot de passe robuste (min 12 caractères, avec caractères spéciaux) sans délai d'expiration nous apparaît un meilleur choix au regard de la fluidité de l'expérience utilisateur.  
 
 
 ## Session et token : 
@@ -213,17 +220,23 @@ L'application de la plupart des protocoles précédemment évoqué, comme l'util
 Ajoutons tout de même à ces protocoles deux recommandations : 
 - La définition de quotas de limitation de requête. Sans impacter l'expérience utilisateur (ou admin ou modérateur), cette mesure permet de prévenir la multiplication de requêtes lors d'une attaque. Cette mesure permet également de mettre en place un historique de l'utilisation de l'API. 
 - Utilisation d'une API **stateless**
+  
+
+## Politique de sauvegarde des serveurs : 
+
+
 
 ## La journalisation : 
 
 Une autre protection concevable est la **journalisation**. Celle-ci consiste à tenir un journal horodaté de toutes les actions se déroulant sur notre serveur. 
-Il est en particulier utile dans le cadre de notre stratégie de sécurisation d'enregister les événements liés aux facteurs d'authentification afin de détecter les tentatives d'authentification frauduleuses (répétion de l'entrée dans le cadre d'une attaque par force brute). 
+Il est en particulier utile dans le cadre de notre stratégie de sécurisation d'enregister les événements liés aux facteurs d'authentification afin de détecter les tentatives d'authentification frauduleuses (répétion de l'entrée dans le cadre d'une attaque par force brute).  
+
 
 ## Sécurisation en phase finale et en maintenance. 
 
 Une fois notre application déployée, il est possible d'effectuer un audit PASSI, en particulier en cas de traitement d'informations sensibles. Cette certification **PASSI** pour _Prestataire d'audit des systèmes d'information_ est une certification permettanty d'attester de la fiabilité de l'application, mais également de la bonne formation du personnel. 
 
-Un **Bug Bounty** est également envisageable, sous réserve de pouvoir offrir aux hackeurs éthiques une récompense attrayante. 
+Un **Bug Bounty** est également envisageable, sous réserve de pouvoir offrir aux hackeurs éthiques une récompense attrayante.  
 
 
 # Conclusion : 
