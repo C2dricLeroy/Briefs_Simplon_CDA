@@ -1,12 +1,8 @@
 Table des matières : 
-
 - [Introduction](#introduction)
   - [Securizing a system, what does it mean?](#securizing-a-system-what-does-it-mean)
   - [Protecting.. but against what ?](#protecting-but-against-what-)
-- [Introduction](#introduction-1)
-  - [Que veut dire sécuriser un système ?](#que-veut-dire-sécuriser-un-système-)
-  - [Se prémunir, mais contre quelles attaques ?](#se-prémunir-mais-contre-quelles-attaques-)
-  - [Comment sécuriser une application ?](#comment-sécuriser-une-application-)
+  - [How can we securize our application ?](#how-can-we-securize-our-application-)
 - [Stratégie de sécurisation :](#stratégie-de-sécurisation-)
   - [La protection navigateur :](#la-protection-navigateur-)
   - [Les protocoles de protection de l'échange de donnée :](#les-protocoles-de-protection-de-léchange-de-donnée-)
@@ -23,16 +19,21 @@ Table des matières :
 
 Proposition de stratégie de sécurisation d'une application web pour la mission locale du Valenciennois. 
 
+___  
+
+
 # Introduction
 ## Securizing a system, what does it mean? 
 
-Securizing a system, is protecting it in advance from attacks. Each web application must be securised. These days, most of the attacks doesn't focus on a specific website but are systematised et automated (the attacks are random and just focus data transfers).
+Securizing a system, is protecting it in advance from attacks. Each web application must be securized. These days, most of the attacks doesn't focus on a specific website but are systematised et automated (the attacks are random and just focus data transfers).
 
-It is well known that Internet is a system that allowed several computers to communicate (computers, servers, ..). In a way to communicate, this devices exchanges packets. This packets must be securised in term of: 
+It is well known that Internet is a system that allowed several computers to communicate (computers, servers, ..). In a way to communicate, this devices exchanges packets. This packets must be securized in term of: 
 - **Confidentiality**: Assuring confidentiallity is assure that no attackers can take notice of our data. When we think about Informatic Security, we can think about crypting data. Crypting data is a way to prevent attackers to read our datas. 
 - **Authenticity**: When two users are sending messages to each other, it is important to verify that each of them truly is who he pretend to be. Verifying authenticity can be resume as verifying identity. 
 - **Integrity**: The sent message must be receive by the receptor in it wholeness and must not have been modified by a potential attacker. 
 We will see that these three points constitute the essence of our security strategy. Moreover, our entire strategy policy aim to ensure theses points. 
+
+___
 
 ## Protecting.. but against what ? 
 
@@ -42,48 +43,25 @@ First of all, let's take a look at the different must commons types of menace we
 - **Denial of service**: In the denial of service, tha attacker want our application to break down. To do that, he will try to overkill our app by sendig it a lot of requests. 
 
 From theses menace families, it exists lots of attacks, here are some: 
-- **Cross-Site-Scripting**: The **XSS** attack is an attack where the attacker is trying to inject some malicious code in our application. 
-- **SQLi**: 
-- **CSRF**:
+- **Cross-Site-Scripting**: The **XSS** attack is an attack where the attacker is trying to inject some malicious code in our application. This malicious code isn't reconized as malicious by the browser, thus the browser gives access to the user's informations (like cookies, token, ...). This new privilege allows the attacker to hijack user's session, redirect the user to a fake website, steal informations, ...
+- **SQLi**: SQL is the most common language for databases. SQL injections are injections of SQL commands in a form on the website in order to display, modify or delete informations. 
+- **CSRF**: CSRF for Cross Site Request Forgery is an attack against a service through the user's privileges. 
 
-# Introduction
-## Que veut dire sécuriser un système ? 
+Taking note of these differents threats seems to be essential in order to introduce the differents terms that will be used throughout this guide. 
 
-Sécuriser un système, c'est le protéger de toute attaque. Chacune des applications web se doit d'être sécurisée. La plupart des attaques ne sont plus ciblées mais systématisées et automatisées (attaques "aléatoires" des applications où transitent des informations). 
+___
 
-Il est bien connu qu'Internet est un  système permettant la communication de plusieurs appareils (ordinateurs, serveurs, ...). Afin de communiquer, ces appareils s'échangent des paquets. Ces paquets doivent être sécurisés en terme de : 
-- **Confidentialité**: Lorsqu'on pense sécurité informatique, on pense au chiffrement des données. Il s'agit ici de chiffrer un message de façon à ce qu'un tiers attaquant ne soit pas en mesure de comprendre le message.
-- **Authenticité**: Lorsque deux utilisateurs s'envoient des messages, il est important de vérifier que chacun des parti est bien celui qu'il prétend être afin de ne pas envoyer un message à un mauvais destinataire attaquant. 
-- **Intégrité**: Le message envoyé doit être conservé dans sa totalité et ne pas être modifié en chemin par un attaquant.  
-Nous verrons que ces trois points constituent les pilliers de toute stratégie de sécurisation.
+## How can we securize our application ? 
 
-L'entièreté de notre proposition de stratégie de sécurisation aura pour but de faire respecter ces trois pilliers de l'échange d'information.   
+Before starting to explain our securization strategy, let's stop one more time on the general processes that will garanty authenticity, integrity and confidentiallity to our data. 
 
+1) **Depth Defense**: A web app use different services to work. Each of theses micro-services which are composing the system are all sub-systems that it is important to secure individually in order to form a global and massive protection. 
+2) **Least Privilege**: Least privilege means that we have to filter which users can access to which informations. Different access can be defined in different sub-systems. 
+3) **Attack surface reduction**: The attack surface reduction goes through minimisation of data's exposures, and through a bunch of good practices for the backup of sensitive data. This approach is complementary to the least privilege policy. 
 
-## Se prémunir, mais contre quelles attaques ? 
+All of the present document is based to follow a maximum of the official ANSSI's recommendations and, moreover develop our app in accordance with the RGPD's policy.  
 
-Avant d'aller plus loin dans la prévention, passons en revue les différentes menaces les plus souvent rencontrées afin de comprendre en amont les attaques qui pourront concerner notre application : 
-- **Compromission des ressources** : La compromission des données est une attaque directe de l'intégrité du site ayant pour objectif de modifier les données de celui-ci. L'attaquant peut faire le choix de modifier les informations publiques du site, ou celui-ci peut tendre un piège aux visiteurs avec un processus nommé _watering hole_.
-- **Vol de données** : Le vol des données est une attaque de la confidentialité des données (la plupart du temps utilisateur). L'attaquant vole des informations confidentielles le plus souvent afin de s'en servir. Nous reviendrons sur les différents types d'attaques en résultant. 
-- **Déni de service** : Un attaquant tente de rendre inaccessible un site ou un service, la plupart du temps en le surchargeant comme avec l'attaque _DDOS_.
-
-Ces familles de menaces donnent lieu à ces attaques les plus courantes : 
-- **Cross-Site-Scripting (XSS)**: C'est une injection de code dans le site puis dans le serveur. L'utilisateur est incité à faire une requête web au nom d'un attaquant. 
-- **Injection attacks (SQLI)**: Injection de commandes SQL afin de tester l'accès aux données.
-- **CSRF** : C'est un type d'attaque par l'intermédiaire de l'utilisateur. La cible de l'attaque est l'application. Il est hautement conseillé pour un site officiel et institutionnel de se prévenir de ce type d'attaques. 
-
-Le passage en revue de ces grandes familles d'attaques nous paraît un point nécessaire afin d'introduire ces termes qui seront utilisés tout au long de ce guide.   
-
-
-## Comment sécuriser une application ? 
-
-vant la présentation de notre stratégie de sécurisation spécifique, arrêtons-nous une fois de plus sur les processus généraux permettant le respect de l'intégrité, de l'authenticité et de la confidentialité des échanges sur internet. 
-
-1) **La défense en profondeur**: Une application, en particulier Web, utilise différents services pour son fonctionnement. Ces différents sevices qui composent le système sont autant de sous-systèmes à sécuriser individuellement. 
-2) **Le moindre privilège**: Le moindre privilège permet de filtrer qui parmi les utilisateurs aura accès à certaines données. Plusieurs niveaux d'accès peuvent être définis parmi plusieurs sous-systèmes. 
-3) **La réduction de la surface d'attaque**: La réduction de la surface d'attaque passe par la minimisation des données exposées, mais également par les bonnes pratiques de sauvegarde des données sensibles. Cette approche est complémentaire du moindre privilège. 
-
-All of the present document is based to follow a maximum of the official ANSSI's recommendations and, moreover in accordance with the RGPD's policy.  
+___
 
 
 # Stratégie de sécurisation : 
@@ -100,6 +78,7 @@ Enfin, afin de s'assurer le respect du principe de réduction de la surface d'at
 
 Pour finir, la mise en place de **SRI** pour _Subressource integrity_ est également fortement conseillée afin de vérifier l'authenticité des ressources aux sources externes. Pour simplifier, lorsqu'une ressource extérieure est terminée, celle-ci est passée dans une fonction dite de hashage qui produit une certaine empreinte. Cette empreinte est mise à disposition afin que le navigateur compare l'exactitude de celle-ci avec la ressource reçue. Si l'empreinte n'a pas changé, les éléments du fichier n'ont pas été modifiés par un attaquant malveillant.   
 
+___
 
 ## Les protocoles de protection de l'échange de donnée : 
 
@@ -115,13 +94,14 @@ Ces protocoles de sécurité sont indispensable à toute navigation Internet, el
 
 Il est à retenir que ces défenses sont nécessaires à la sécurisation d'une application mais non suffisantes. C'est pourquoi d'autres vulnérabilités sont à prendre en compte. Dans ce contexte, notre sécurisation d'application s'appuiera forcément sur le procole HTTPS mais ne peut se suffir de celui-ci.   
 
+___ 
 
 ## Hachage, salage et Mots de passe : 
 
 Lorsque l'on parle de sécurisation des donnée, nous souhaitons rendre illisible l'information à tout potentiel attaquant. Pour cela, un message en clair est chiffré à l'aide de ce que l'on appelle une fonction de hachage. Le reésultat de cette opération de chiffrement est appelé une "empreinte". 
 Cette **fonction de hachage** est une fonction mathématique qui fragmente et modifie un message de façon à ce que le résultat obtenu ne permette pas le retour au message originel. 
 
-Concernant l'algorithme utilisé pour le hachage, nous faisons le choix d'utiliser le **SHA 256**, algorithme développé par la NSA. Il est une version réputée pour sa fiabilité, sa précision et sa difficulté de déchiffrement. 
+Concernant l'algorithme utilisé pour le hachage, nous faisons le choix d'utiliser le **SHA 256**. _Secure Hash Algorithm_ est un algorithme développé par la NSA. Il est une version réputée pour sa fiabilité, sa précision et sa difficulté de déchiffrement. De plus, cet algorithme de hashage permet un faible poids de stockage, une économie de bande passante ainsi qu'une facilité de calcul. L'algorithe SHA-256 se place donc en bon candidat pour un compromis parfait entre sécurité et performance. 
 
 Néanmoins, la fonction de hachage comporte une faille: lorsque l'algorithme clé est trouvé, tout _input_ est facilement déchiffrable par l'attaquant. C'est pour cette raison qu'il est indispensable d'y adjoindre un **salage**. 
 Le salage est une opération qui consiste à ajouter des mots ou des caractères aléatoires à l'empreinte obtenue par le hachage. Le tout est haché une nouvelle fois de façon à ce que l'on ne puisse plus trouver le messsage original, sauf si l'on connait le sel utilisé. 
@@ -142,6 +122,7 @@ L'ensemble des propositions de ce guide (canal sécurisé TLS, authentification,
 
 Toute donnée sensible sera chiffrée suivant le même processus. De même, pour limiter les risques en réduisant la surface d'attaque et en accord avec la législation RGPD (Règlement Général sur la Protection des Données), chaque donnée sensible devra être récolté pour un but précis et pré-assigné.   
 
+___
 
 ## La sanitisation : 
 
@@ -158,6 +139,7 @@ Plusieurs niveau de traitement des données sont disonibles :
   
 Pour notre stratégie de sécurisation, la sanitisation se doit d'intervenir côté client et côté serveur, d'une part afin de fluidifier l'expérience utilisateur d'un utilisateur maladroit ne respectant pas les conditions, d'autre part pour empêcher en profondeur (avec un traitement plus lourd et donc plus long), un attaquant d'injecter de mauvaises commandes. Cette défense est particulièrement utile envers l'injection SQL et la XSS.   
 
+___
 
 ## L'accès aux données : 
 
@@ -174,6 +156,7 @@ Différents niveaux d'accès sont demandés dans le Product Backlog, en accord a
 De façon générale, les données seront stockées selon une politique de sauvegarde stricte. 
 De plus, les recommandations liées au _Règlement général sur la protection des données_ sera suivi.  
 
+___
 
 ## L'authentification : 
 
@@ -194,6 +177,7 @@ Pour les profils _administrateurs_ et _modérateurs_, il est préférable d'opte
 
 Pour les profils _utilisateurs_ , nous mettons en place un couple motd de passe/identifiant. Le choix d'un mot de passe robuste (min 12 caractères, avec caractères spéciaux) sans délai d'expiration nous apparaît un meilleur choix au regard de la fluidité de l'expérience utilisateur.  
 
+___
 
 ## Session et token : 
 
@@ -203,12 +187,13 @@ Il est dans ce contexte important de définir un temps de session à l'issue duq
 Dans le cas de notre application et afin de conserver une expérience utilisateur fluide, nous décidons de définir un temps de session long d'une journée. Ce choix arbitraire semble un compromis entre une expérience utilisateur fluide en laissant le temps de procéder aux démarches en jeu, tout en garantissant une certaine sécurité. De plus, notre application ne met pas en jeu de données sensibles concernant les utilisateurs, permettant ainsi un temps de session plus long. 
 
 La session est mise en place par l'envoie en mémoire du navigateur côté client d'un cookie de session. 
-Le **cookie** un fichier déposé en mémoire du navigateur. Il n'est en principe utilisable que par le site l'ayant déposé. Les cookies sont définis par le protocole HTTP et permettent de stocker des informations concernant le site en mémoire du navigzateur afin d'améliorer la navigation sur celui-ci (préférences, ...). L'information contenue dans le cookie est 
+Le **cookie** un fichier déposé en mémoire du navigateur. Il n'est en principe utilisable que par le site l'ayant déposé. Les cookies sont définis par le protocole HTTP et permettent de stocker des informations concernant le site en mémoire du navigzateur afin d'améliorer la navigation sur celui-ci (préférences, ...). L'information contenue dans le cookie est chiffrée, mais comme toute donnée personnelle elle doit être traitée avec précaution. C'est ce pourquoi nous suivrons les recommandations de la CNIL en matière d'intégrité des données personnelles (possibilité d'interdire l'enregistrement de cookies, ... )
 
-Dans notre cas, afin de faciliter l'expérience utilisateur en maintenant des sessions ouvertes, nous pouvons utiliser les cookies afin de contenir un identifiant de session unique. Lors des navigations futures, le navigateur enverra l'information dans ce cookie lors de la requête. Le serveur reconnaît l'authentification et permet l'accès au service. 
+Dans notre cas, afin de faciliter l'expérience utilisateur en maintenant des sessions ouvertes, nous pouvons utiliser les cookies afin de contenir un identifiant de session unique. Lors des navigations futures, le navigateur enverra l'information dans ce cookie lors de la requête. Le serveur reconnaît l'authentification et permet l'accès au service. Un autre intérêt soulevé par l'utilisation d'un cookie est la possibilité d'y stocker l'avancement de la démarche administrative de l'internanute (par exemple pour faciliter une prise de RDV).
 
 Attention, l'utilisation de cookies nécessite une bonne sécurisation globale de l'application. 
 
+___
 
 ## La sécurisation des API
 
@@ -219,18 +204,32 @@ L'application de la plupart des protocoles précédemment évoqué, comme l'util
 
 Ajoutons tout de même à ces protocoles deux recommandations : 
 - La définition de quotas de limitation de requête. Sans impacter l'expérience utilisateur (ou admin ou modérateur), cette mesure permet de prévenir la multiplication de requêtes lors d'une attaque. Cette mesure permet également de mettre en place un historique de l'utilisation de l'API. 
-- Utilisation d'une API **stateless**
+- Utilisation d'une API **stateless** : Une API stateless ne stocke aucune information client côté serveur. Pour ce faire, chaque requête doit contenir l'ensemble des informations nécessaires. Le serveur ne relâche aucune information des précédentes requêtes. Les principaux avantages de ce type d'API sont leur moindre complexité, une meilleure performance par la mise en cache, aisni qu'une meilleure maîtrise des enjeux de sécurité. 
   
+___
 
 ## Politique de sauvegarde des serveurs : 
 
+Le serveur est comme un ordinateur distant sur lequel est stocké notre application. Ce stockage est appellé hébergement et fait suite au déploiement (la mise en ligne) de notre application. 
 
+Selon l'offre d'hébergement gratuit, le serveur est plus ou moins sécurisé.
+Toutefois, afin de garantir la sécurité des informations stockées en cas d'attaque (suppression) ou d'erreur de gestion (bug ou mauvaise manipulation) il est nécessaire d'effectuer des enregistrements réguliers de l'état de notre application appelés _backups_. 
+
+Ces enregistrements, dans notre cas _a minima_ quotidiens nécessitent la mise en place d'un processus automatisé et fluide afin de garantir la disponibilité du site. De plus, il est nécessaire de choisir une option permettant de recouvrir les données rapidement et avec fiabilité. 
+
+Nous proposons une sauvegarde **différentielle**. La sauvegarde de type différentielle définit une sauvegarde "mère", puis à délai régulier enregistre une nouvelle sauvegarde ne contenant que les fichiers ajoutés ou modifiés. Ce type de sauvegarde permet un recouvrement rapide et efficace des dernières informations. Chaque sauvegarde sera stockée sur un serveur tiers appelé _backup servor_ (potentiellement fourni selon le type d'hébergement choisi). Dans le but de respecter la règle des 3 - 2 - 1 adoptée par Acronis (société de cyberprotection), nous proposons la mise en place d'une copie locale régulière des données dans un disque dur sous protection afin de posséder 3 copies des données (une dans l'application, une dans le backup serveur et une copie locale). Cette règle énonce également la nécessité d'_a minima_ deux types de stockage (ici le disque dur et le serveur de déploiement) ainsi que une copie sur un cloud (backup servor). 
+
+Nous conseillons ici de posséder solliciter deux entreprises différentes pour l'hébergeur du serveur de déploiement et le cloud de stockage afin de maximiser la sécurité des données. 
+Le service **Duplicati** permettra la mise ne place de la sauvegarde automatique.
+
+___
 
 ## La journalisation : 
 
 Une autre protection concevable est la **journalisation**. Celle-ci consiste à tenir un journal horodaté de toutes les actions se déroulant sur notre serveur. 
 Il est en particulier utile dans le cadre de notre stratégie de sécurisation d'enregister les événements liés aux facteurs d'authentification afin de détecter les tentatives d'authentification frauduleuses (répétion de l'entrée dans le cadre d'une attaque par force brute).  
 
+___
 
 ## Sécurisation en phase finale et en maintenance. 
 
@@ -238,9 +237,22 @@ Une fois notre application déployée, il est possible d'effectuer un audit PASS
 
 Un **Bug Bounty** est également envisageable, sous réserve de pouvoir offrir aux hackeurs éthiques une récompense attrayante.  
 
+___
 
 # Conclusion : 
 
 Le développement d'une application passe par plusieurs étapes. Il est important de garder en tête qu'un processus de sécurisation est un processus global et englobant la totalité de la vie de l'application, du design à la maintenance. 
 
 Des différentes stratégies de travail disponibles, nous pensons que la méthodologie Agile et en particulier Scrum permettra de maximiser la sécurisation de l'application en découpant sa production en de petits cycles dans lesquels la sécurité peut être évaluée et ré-évaluée de façon automatisée et systématique.
+
+
+Sources : 
+- https://owasp.org/www-community/attacks/xss/
+- https://restfulapi.net/statelessness/
+- https://www.amenschool.fr/politique-sauvegarde-informatique-serveur/
+- http://www.pompage.net/traduction/la-cryptographie-et-le-web-hachage
+- https://www.vaadata.com/blog/fr/comment-securiser-les-systemes-dauthentification-de-gestion-de-sessions-et-de-controle-dacces-de-vos-applications-web/
+- ANSSI(2021). _Recommandations pour la mise en oeuvre d'un site web : Maîtriser les standards de sécurité côté navigateur_. Consulté sur https://www.ssi.gouv.fr/guide/recommandations-pour-la-securisation-des-sites-web/
+- ANSSI(2021). _Recommandations relatives à l'authentification multifacteur et aux mots de passe_. Consulté sur https://www.ssi.gouv.fr/guide/recommandations-relatives-a-lauthentification-multifacteur-et-aux-mots-de-passe/
+- https://www.acronis.com/fr-fr/blog/posts/remote-backup-server/
+- 
